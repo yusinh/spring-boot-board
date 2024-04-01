@@ -97,13 +97,22 @@ public class ArticleController { // Model + Controller
         return "list";
     }
 
+    // 실제 데이터 저장 처리 부분
     @RequestMapping("/add")
-    @ResponseBody
     public String add(@RequestParam("title") String title,
-                      @RequestParam("body") String body) {
+                      @RequestParam("body") String body,
+                        Model model) {
 
         articleRepository.saveArticle(title, body);
-        return "게시물이 등록되었습니다.";
+        ArrayList<Article> articleList = articleRepository.findAll();
+        model.addAttribute("articleList", articleList);
+        return "list";
+    }
 
+
+    // 입력 화면 보여주기
+    @RequestMapping("/form")
+    public String form() {
+        return "form";
     }
 }
