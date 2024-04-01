@@ -3,6 +3,7 @@ package com.example.tboard.domain;
 import com.example.tboard.base.CommonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,13 +23,11 @@ public class ArticleController { // Model + Controller
     int WRONG_VALUE = -1;
 
 
-    public void search() {
-        // 검색어를 입력
-//        System.out.println("검색 키워드를 입력해주세요 :");
-//        String keyword = scan.nextLine();
-//        ArrayList<Article> searchedList = articleRepository.findArticleByKeyword(keyword);
-//
-//        articleView.printArticleList(searchedList);
+    @RequestMapping("/search")
+    @ResponseBody
+    public ArrayList<Article> search(@RequestParam(value="keyword", defaultValue = "") String keyword) {
+    ArrayList<Article> searchedList = articleRepository.findArticleByKeyword(keyword);
+        return searchedList;
     }
 
 @RequestMapping("/detail")
@@ -91,11 +90,11 @@ public class ArticleController { // Model + Controller
     }
 
     @RequestMapping("/list")
-    @ResponseBody
-    public ArrayList<Article> list() {
+    public String list(Model model) {
         ArrayList<Article> articleList = articleRepository.findAll();
+        model.addAttribute("articleList",articleList);
 
-        return articleList;
+        return "list";
     }
 
     @RequestMapping("/add")
