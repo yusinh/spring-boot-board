@@ -1,7 +1,6 @@
 package com.example.tboard.domain;
 
 import com.example.tboard.base.CommonUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,8 +30,7 @@ public class ArticleController { // Model + Controller
     }
 
 @RequestMapping("/detail")
-@ResponseBody
-    public String detail(@RequestParam("articleId") int articleId) {
+    public String detail(@RequestParam("articleId") int articleId, Model model) {
         Article article = articleRepository.findArticleById(articleId);
 
         if (article == null) {
@@ -41,21 +39,9 @@ public class ArticleController { // Model + Controller
 
         article.increaseHit();
 
-        // 객체를 -> json 문자열로 변환 -> jackson 라이브러리 사용
-        String jsonString = "";
+        model.addAttribute("article", article);
 
-        try {
-            // ObjectMapper 인스턴스 생성
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            // 객체를 JSON 문자열로 변환
-            jsonString = objectMapper.writeValueAsString(article);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return jsonString;
+        return "detail";
     }
 
     @RequestMapping("/delete")
@@ -100,13 +86,11 @@ public class ArticleController { // Model + Controller
     // 실제 데이터 저장 처리 부분
     @RequestMapping("/add")
     public String add(@RequestParam("title") String title,
-                      @RequestParam("body") String body,
-                        Model model) {
+                      @RequestParam("body") String body) {
 
         articleRepository.saveArticle(title, body);
-        ArrayList<Article> articleList = articleRepository.findAll();
-        model.addAttribute("articleList", articleList);
-        return "list";
+
+        return "redirect:/list"; // 브라우저의 주소가 /list로 바뀜
     }
 
 
