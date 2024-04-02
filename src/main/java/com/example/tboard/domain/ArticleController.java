@@ -55,21 +55,33 @@ public class ArticleController { // Model + Controller
         return "redirect:/list";
     }
 
-@RequestMapping("/update")
-@ResponseBody
-    public String update(@RequestParam("articleId") int inputId,
-                       @RequestParam("newTitle") String newTitle,
-                       @RequestParam("newBody") String newBody
-                        ) {
+    @GetMapping("/update/{articleId}")
+    public String updateForm(@PathVariable("articleId") int articleId , Model model) {
 
-        Article article = articleRepository.findArticleById(inputId);
+        Article article = articleRepository.findArticleById(articleId);
 
         if (article == null) {
-            return "없는 게시물입니다.";
+            throw new RuntimeException("없는 게시물입니다.");
+        }
+        model.addAttribute("article", article);
+
+        return "updateForm";
+    }
+
+@PostMapping("/update/{articleId}")
+    public String update(@PathVariable("articleId") int articleId,
+                       @RequestParam("title") String title,
+                       @RequestParam("body") String body
+                        ) {
+
+        Article article = articleRepository.findArticleById(articleId);
+
+        if (article == null) {
+            throw new RuntimeException("없는 게시물입니다.");
         }
 
-        articleRepository.updateArticle(article, newTitle, newBody);
-            return "%d번 게시물이 수정되었습니다.".formatted(inputId);
+        articleRepository.updateArticle(article, title, body);
+            return "redirect:/detail/%d".formatted(articleId);
     }
 
     @RequestMapping("/list")
@@ -78,6 +90,13 @@ public class ArticleController { // Model + Controller
         model.addAttribute("articleList",articleList);
 
         return "list";
+    }
+
+
+    // 입력 화면 보여주기
+    @GetMapping("/add")
+    public String form() {
+        return "form";
     }
 
     // 실제 데이터 저장 처리 부분
@@ -91,9 +110,4 @@ public class ArticleController { // Model + Controller
     }
 
 
-    // 입력 화면 보여주기
-    @GetMapping("/add")
-    public String form() {
-        return "form";
-    }
 }
